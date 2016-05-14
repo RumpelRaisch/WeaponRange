@@ -23,6 +23,7 @@ local TEXTOPTIONS = {
     FAR = "∞",
     PRE = "",
     SUF = " m",
+    SEP = "|",
 }
 local StringTable = {
     One = "One",
@@ -77,24 +78,29 @@ InterfaceOptions.AddTextInput({id="TEXT_FAR", label="Far Text", default=TEXTOPTI
 InterfaceOptions.AddTextInput({id="TEXT_PRE", label="Range Prefix", default=TEXTOPTIONS.PRE, maxlen=32})
 InterfaceOptions.AddTextInput({id="TEXT_SUF", label="Range Suffix", default=TEXTOPTIONS.SUF, maxlen=32})
 InterfaceOptions.StopGroup()
+InterfaceOptions.StartGroup({id="MAX_RANGE", label="Max range Options"})
+InterfaceOptions.AddCheckBox({id="MAX_RANGE_ENABLED", label="Show max range", default=true})
+InterfaceOptions.AddTextInput({id="TEXT_SEP", label="Separator", default=TEXTOPTIONS.SEP, maxlen=3})
+InterfaceOptions.StopGroup()
 
 --VARIABLES
 
-local enabled           = nil
-local HUDShow           = nil
-local alpha         = nil
-local updatewidth       = nil
-local aim           = nil
-local message           = ""
-local last          = nil
-local distance          = nil
-local runonce           = nil
-local textformat        = ""
-local HidePlace         = false
-local HideMove          = false
-local HideInput         = true
-local Glow          = nil
-local InVehicle         = false
+local enabled      = nil
+local HUDShow      = nil
+local alpha        = nil
+local updatewidth  = nil
+local aim          = nil
+local message      = ""
+local last         = nil
+local distance     = nil
+local runonce      = nil
+local textformat   = ""
+local HidePlace    = false
+local HideMove     = false
+local HideInput    = true
+local Glow         = nil
+local InVehicle    = false
+local ShowMaxRange = true;
 
 --EVENTS
 
@@ -190,6 +196,17 @@ OnMessageOption.WPN =
         RAFRAME:Show(not HideWeapon)
     end
 
+OnMessageOption.MAX_RANGE_ENABLED =
+    function (message)
+        ShowMaxRange = message;
+
+        if true == ShowMaxRange or "true" == ShowMaxRange then
+            InterfaceOptions.DisableOption("TEXT_SEP", false);
+        else
+            InterfaceOptions.DisableOption("TEXT_SEP", true);
+        end
+    end
+
 OnMessageOption.INPUT =
     function (message)
         hideByInput = message
@@ -269,6 +286,15 @@ OnMessageOption.TEXT_SUF =
         end
     end
 
+OnMessageOption.TEXT_SEP =
+    function (message)
+        if not message.text then
+            TEXTOPTIONS.SEP = message
+        else
+            TEXTOPTIONS.SEP = message.text
+        end
+    end
+
 function SetOptionsAvailability()
     InterfaceOptions.DisableFrameMobility(FRAME, not enabled)
     InterfaceOptions.DisableOption("COLOR_OOR", not enabled)
@@ -279,6 +305,8 @@ function SetOptionsAvailability()
     InterfaceOptions.DisableOption("TEXT_FAR", not enabled)
     InterfaceOptions.DisableOption("TEXT_PRE", not enabled)
     InterfaceOptions.DisableOption("TEXT_SUF", not enabled)
+    InterfaceOptions.DisableOption("TEXT_SEP", not enabled)
+    InterfaceOptions.DisableOption("MAX_RANGE_ENABLED", not enabled)
 end
 
 --FUNCTIONS
@@ -310,6 +338,7 @@ function UpdateMessage()
 
         if distance ~= last then
             last = distance
+
             if distance == -1 then
                 SetColour("FAR")
             elseif distance > tonumber(range) then
@@ -317,6 +346,7 @@ function UpdateMessage()
             else
                 SetColour("TEXT")
             end
+
             if (runonce == true or enabled == true or enabled == "true") then
                 if distance == -1 then
                     local distance_f = string.find(tostring(distance), "%.");
@@ -325,7 +355,17 @@ function UpdateMessage()
                         distance = tostring(distance) .. ".0";
                     end
 
-                    RAFRAME:SetText(TEXTOPTIONS.FAR .. " | " .. tostring(range) .. TEXTOPTIONS.SUF)
+                    local text = TEXTOPTIONS.FAR;
+
+                    if true == ShowMaxRange then
+                        if "" ~= TEXTOPTIONS.SEP then
+                            text = text .. " " .. TEXTOPTIONS.SEP .. " ";
+                        end
+
+                        text = text .. tostring(range) .. TEXTOPTIONS.SUF;
+                    end
+
+                    RAFRAME:SetText(text);
                 else
                     local distance_f = string.find(tostring(distance), "%.");
                     local range_f = string.find(tostring(range), "%.");
@@ -338,7 +378,17 @@ function UpdateMessage()
                         range = tostring(range) .. ".0";
                     end
 
-                    RAFRAME:SetText(TEXTOPTIONS.PRE .. tostring(distance) .. TEXTOPTIONS.SUF .. " | " .. tostring(range) .. TEXTOPTIONS.SUF)
+                    local text = TEXTOPTIONS.PRE .. tostring(distance) .. TEXTOPTIONS.SUF;
+
+                    if true == ShowMaxRange then
+                        if "" ~= TEXTOPTIONS.SEP then
+                            text = text .. " " .. TEXTOPTIONS.SEP .. " ";
+                        end
+
+                        text = text .. tostring(range) .. TEXTOPTIONS.SUF;
+                    end
+
+                    RAFRAME:SetText(text);
                 end
             end
         end
