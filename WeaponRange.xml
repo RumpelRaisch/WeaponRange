@@ -1,0 +1,41 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns="http://www.red5studios.com/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.red5studios.com/ ../../../schemas/component.xsd">
+    <Info
+        title="Weapon Range"
+        author="Rumpel,Hanachi"
+        description="Shows the range to the target."
+        url="http://forums.firefall.com/community/threads/8542622/"
+        uiVersion="1000"
+    />
+
+    <Textures></Textures>
+
+    <Events>
+        <Event name="MY_HUD_SHOW"           bind="OnShow"             />
+        <Event name="ON_PLAYER_READY"       bind="OnPlayerReady"      />
+        <Event name="ON_COMPONENT_LOAD"     bind="OnComponentLoad"    />
+        <Event name="ON_WEAPON_CHANGED"     bind="OnWeaponChanged"    />
+        <Event name="ON_INPUT_MODE_CHANGED" bind="OnInputModeChanged" />
+        <Event name="ON_MOVEMENT_MODIFIER"  bind="OnMovementModifier" />
+        <Event name="ON_PLACE_CALLDOWN"     bind="OnPlaceCalldown"    />
+        <Event name="ON_SEAT_CHANGED"       bind="OnSeatChanged"      />
+    </Events>
+
+    <Styles></Styles>
+
+    <BluePrints></BluePrints>
+
+
+    <Frames>
+        <HUDFrame name="RANGEFRAME" dimensions="left:30.5%; width:125; bottom:75%; height:20">
+            <Children>
+                <Text id="RANGETEXT" dimensions="left:0%; width:100%; bottom:100%; height:22" style="font:AAG_Huge; halign:center; valign:center; alpha:1.0"/>
+            </Children>
+            <OnMessage bind="OnMessage"/>
+        </HUDFrame>
+    </Frames>
+
+</Component>
