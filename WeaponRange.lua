@@ -5,6 +5,7 @@
 
 require "math";
 require "string";
+require "lib/lib_ChatLib";
 require "lib/lib_InterfaceOptions"
 require "lib/lib_LightWindow"
 require "lib/lib_Slash"
@@ -101,6 +102,7 @@ local HideInput    = true
 local Glow         = nil
 local InVehicle    = false
 local ShowMaxRange = true;
+local RUMPEL       = {};
 
 --EVENTS
 
@@ -110,8 +112,12 @@ function OnComponentLoad()
     end, "Weapon Range")
 end
 
-function OnShow(args)
-    FRAME:ParamTo("alpha", tonumber(args.show), args.dur);
+function OnShow(ARGS)
+    -- RUMPEL.SystemMsg(ARGS);
+
+    if true ~= ARGS.reticle_scope then
+        FRAME:ParamTo("alpha", tonumber(ARGS.show), ARGS.dur);
+    end
 end
 
 function OnPlayerReady()
@@ -408,4 +414,8 @@ function SetColour(Format)
     else
         RAFRAME:SetParam("glow", 0)
     end
+end
+
+function RUMPEL.SystemMsg(message)
+    ChatLib.SystemMessage({text = tostring(message)});
 end
